@@ -1,63 +1,41 @@
-import { Tabs } from 'expo-router';
+import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { Clapperboard, CheckCircle, Search as SearchIcon } from 'lucide-react-native';
-import { COLORS } from '../constants/theme';
-import { View, StyleSheet } from 'react-native';
+import { ThemeProvider, useTheme } from '../context/ThemeContext';
+import { SidebarProvider } from '../components/Sidebar';
+
+import { OfflineProvider } from '../context/OfflineContext';
+
+function InnerLayout() {
+    const { colors, isDark } = useTheme();
+
+    return (
+        <>
+            <StatusBar style={isDark ? "light" : "dark"} backgroundColor={colors.background} />
+            <Stack
+                screenOptions={{
+                    headerShown: false,
+                    contentStyle: { backgroundColor: colors.background },
+                    animation: 'fade',
+                }}
+            >
+                <Stack.Screen name="index" />
+                <Stack.Screen name="auth/login" options={{ animation: 'slide_from_right' }} />
+                <Stack.Screen name="dashboard/index" options={{ animation: 'fade' }} />
+                <Stack.Screen name="collection/[type]" options={{ headerShown: false, animation: 'slide_from_right' }} />
+                <Stack.Screen name="settings/index" options={{ animation: 'slide_from_bottom' }} />
+            </Stack>
+        </>
+    );
+}
 
 export default function AppLayout() {
     return (
-        <>
-            <StatusBar style="light" />
-            <Tabs
-                screenOptions={{
-                    headerShown: false,
-                    tabBarStyle: {
-                        backgroundColor: COLORS.tabBar,
-                        borderTopWidth: 0,
-                        height: 65,
-                        paddingBottom: 10,
-                        paddingTop: 10,
-                        elevation: 0,
-                        shadowOpacity: 0,
-                    },
-                    tabBarActiveTintColor: COLORS.primary,
-                    tabBarInactiveTintColor: COLORS.textSecondary,
-                    tabBarShowLabel: true,
-                    tabBarLabelStyle: {
-                        fontSize: 12,
-                        fontWeight: '600',
-                        marginTop: 4,
-                    },
-                }}
-            >
-                <Tabs.Screen
-                    name="index"
-                    options={{
-                        title: 'Watch List',
-                        tabBarIcon: ({ color, size }) => (
-                            <Clapperboard color={color} size={size} />
-                        ),
-                    }}
-                />
-                <Tabs.Screen
-                    name="search"
-                    options={{
-                        title: 'Discover',
-                        tabBarIcon: ({ color, size }) => (
-                            <SearchIcon color={color} size={size} />
-                        ),
-                    }}
-                />
-                <Tabs.Screen
-                    name="watched"
-                    options={{
-                        title: 'Watched',
-                        tabBarIcon: ({ color, size }) => (
-                            <CheckCircle color={color} size={size} />
-                        ),
-                    }}
-                />
-            </Tabs>
-        </>
+        <ThemeProvider>
+            <OfflineProvider>
+                <SidebarProvider>
+                    <InnerLayout />
+                </SidebarProvider>
+            </OfflineProvider>
+        </ThemeProvider>
     );
 }
